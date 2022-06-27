@@ -1,0 +1,5 @@
+/build
+/stage
+/senv
+/tmp
+/gdb*.txt
