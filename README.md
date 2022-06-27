@@ -38,7 +38,12 @@ later morphed into VTK + MPI + OSPRay, hence why the build steps include a
 superfluous OSPRay build.
 
 ```console
-$ ./go.sh docker build
+$ time ./go.sh docker build
+...
+
+real    0m48.717s
+user    0m0.082s
+sys     0m0.070s
 $ ./go.sh docker start
 $ ./go.sh spack git clone
 $ ./go.sh spack env create
