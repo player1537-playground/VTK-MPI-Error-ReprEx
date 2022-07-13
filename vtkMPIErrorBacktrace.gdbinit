@@ -32,5 +32,3 @@ commands
 
     cont
 end
-
-cont

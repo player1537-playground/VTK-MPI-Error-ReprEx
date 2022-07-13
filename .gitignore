@@ -3,3 +3,7 @@
 /senv
 /tmp
 /gdb*.txt
+/core.*
+/external/vtk
+/external/ospray
+/tools/spack

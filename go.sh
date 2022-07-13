@@ -26,14 +26,14 @@ go-docker() {
     "${FUNCNAME[0]:?}-$@"
 }
 
-go-docker-build() {
-    docker build \
+go-docker-build() (
+    exec docker build \
         "${docker_tag[@]/#/--tag=}" \
         "${docker_source:?}"
-}
+)
 
-go-docker-start() {
-    docker run \
+go-docker-start() (
+    exec docker run \
         --rm \
         --detach \
         --init \
@@ -45,16 +45,16 @@ go-docker-start() {
         --mount "type=bind,src=${docker_root:?},dst=${docker_root:?}" \
         "${docker_tag:?}" \
         sleep infinity
-}
+)
 
-go-docker-stop() {
-    docker stop \
+go-docker-stop() (
+    exec docker stop \
         --time 0 \
         "${docker_name:?}"
-}
+)
 
-go-docker-exec() {
-    docker exec \
+go-docker-exec() (
+    exec docker exec \
         --interactive \
         --detach-keys="ctrl-q,ctrl-q" \
         --tty \
@@ -64,7 +64,7 @@ go-docker-exec() {
         --env HOSTNAME \
         "${docker_name:?}" \
         "$@"
-}
+)
 
 go-docker-go() {
     go-docker-exec "${root:?}/go.sh" \
@@ -109,20 +109,20 @@ go-spack-git() {
     "${FUNCNAME[0]:?}-$@"
 }
 
-go-spack-git-clone() {
-    git \
+go-spack-git-clone() (
+    exec git \
         clone \
         "${spack_git_repo:?}" \
         "${spack_git_source:?}" \
         ${spack_git_ref:+--branch "${spack_git_ref:?}"}
-}
+)
 
-go-spack-git-checkout() {
-    git \
+go-spack-git-checkout() (
+    exec git \
         -C "${spack_git_source:?}" \
         checkout \
         "${spack_git_ref:?}"
-}
+)
 
 go-spack-env() {
     "${FUNCNAME[0]:?}-$@"
@@ -196,50 +196,50 @@ go-ospray() {
     go spack run "${FUNCNAME[0]:?}-$@"
 }
 
-go-ospray-clean() {
-    rm -rf \
+go-ospray-clean() (
+    exec rm -rf \
         "${ospray_cmake_build:?}" \
         "${ospray_cmake_stage:?}"
-}
+)
 
 go-ospray-git() {
     "${FUNCNAME[0]:?}-$@"
 }
 
-go-ospray-git-clone() {
-    git clone \
+go-ospray-git-clone() (
+    exec git clone \
         "${ospray_git_repo:?}" \
         "${ospray_git_source:?}" \
         ${ospray_git_ref:+--branch "${ospray_git_ref:?}"}
-}
+)
 
-go-ospray-git-checkout() {
-    git \
+go-ospray-git-checkout() (
+    exec git \
         -C "${ospray_git_source:?}" \
         checkout \
         ${ospray_git_ref:+"${ospray_git_ref:?}"}
-}
+)
 
 go-ospray-cmake() {
     "${FUNCNAME[0]:?}-$@"
 }
 
-go-ospray-cmake-configure() {
-    cmake \
+go-ospray-cmake-configure() (
+    exec cmake \
         -H"${ospray_cmake_source:?}" \
         -B"${ospray_cmake_build:?}" \
         -DCMAKE_INSTALL_PREFIX:PATH="${ospray_cmake_stage:?}" \
         "${ospray_cmake_config[@]}"
-}
+)
 
 # env: re, par
-go-ospray-cmake--build() {
-    cmake \
+go-ospray-cmake--build() (
+    exec cmake \
         --build "${ospray_cmake_build:?}" \
         --verbose \
         ${re+--clean-first} \
         ${par+--parallel}
-}
+)
 
 go-ospray-cmake-build() {
     local re par
@@ -261,11 +261,11 @@ go-ospray-cmake-reparbuild() {
     go-ospray-cmake--build
 }
 
-go-ospray-cmake-install() {
-    cmake \
+go-ospray-cmake-install() (
+    exec cmake \
         --install "${ospray_cmake_build:?}" \
         --verbose
-}
+)
 
 go-ospray-run() {
     PATH=${ospray_run_bindir:?}${PATH:+:${PATH:?}} \
@@ -313,6 +313,7 @@ vtk_cmake_config=(
     -DVTK_REPORT_OPENGL_ERRORS=OFF
     -DVTK_ALL_NEW_OBJECT_FACTORY=ON
     -DVTK_USE_MPI=ON
+    -DVTK_OPENGL_HAS_EGL=ON
 
     -DVTK_MODULE_ENABLE_VTK_AcceleratorsVTKmCore:STRING=DONT_WANT
     -DVTK_MODULE_ENABLE_VTK_AcceleratorsVTKmDataModel:STRING=DONT_WANT
@@ -473,11 +474,11 @@ vtk_cmake_config=(
     -DVTK_MODULE_ENABLE_VTK_PythonContext2D:STRING=DONT_WANT
     -DVTK_MODULE_ENABLE_VTK_RenderingQt:STRING=DONT_WANT
     -DVTK_MODULE_ENABLE_VTK_RenderingRayTracing:STRING=YES
-    -DVTK_MODULE_ENABLE_VTK_RenderingSceneGraph:STRING=DONT_WANT
+    -DVTK_MODULE_ENABLE_VTK_RenderingSceneGraph:STRING=YES
     -DVTK_MODULE_ENABLE_VTK_RenderingTk:STRING=DONT_WANT
-    -DVTK_MODULE_ENABLE_VTK_RenderingUI:STRING=DONT_WANT
+    -DVTK_MODULE_ENABLE_VTK_RenderingUI:STRING=YES
     -DVTK_MODULE_ENABLE_VTK_RenderingVR:STRING=DONT_WANT
-    -DVTK_MODULE_ENABLE_VTK_RenderingVolume:STRING=DONT_WANT
+    -DVTK_MODULE_ENABLE_VTK_RenderingVolume:STRING=YES
     -DVTK_MODULE_ENABLE_VTK_RenderingVolumeAMR:STRING=DONT_WANT
     -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2:STRING=DONT_WANT
     -DVTK_MODULE_ENABLE_VTK_RenderingVtkJS:STRING=DONT_WANT
@@ -560,50 +561,50 @@ go-vtk() {
     go ospray run "${FUNCNAME[0]:?}-$@"
 }
 
-go-vtk-clean() {
-    rm -rf \
+go-vtk-clean() (
+    exec rm -rf \
         "${vtk_cmake_build:?}" \
         "${vtk_cmake_stage:?}"
-}
+)
 
 go-vtk-git() {
     "${FUNCNAME[0]:?}-$@"
 }
 
-go-vtk-git-clone() {
-    git clone \
+go-vtk-git-clone() (
+    exec git clone \
         "${vtk_git_repo:?}" \
         "${vtk_git_source:?}" \
         ${vtk_git_ref:+--branch "${vtk_git_ref:?}"}
-}
+)
 
-go-vtk-git-checkout() {
-    git \
+go-vtk-git-checkout() (
+    exec git \
         -C "${vtk_git_source:?}" \
         checkout \
         ${vtk_git_ref:+"${vtk_git_ref:?}"}
-}
+)
 
 go-vtk-cmake() {
     "${FUNCNAME[0]:?}-$@"
 }
 
-go-vtk-cmake-configure() {
-    cmake \
+go-vtk-cmake-configure() (
+    exec cmake \
         -H"${vtk_cmake_source:?}" \
         -B"${vtk_cmake_build:?}" \
         -DCMAKE_INSTALL_PREFIX:PATH="${vtk_cmake_stage:?}" \
         "${vtk_cmake_config[@]}"
-}
+)
 
 # env: re, par
-go-vtk-cmake--build() {
-    cmake \
+go-vtk-cmake--build() (
+    exec cmake \
         --build "${vtk_cmake_build:?}" \
         --verbose \
         ${re+--clean-first} \
         ${par+--parallel}
-}
+)
 
 go-vtk-cmake-build() {
     local re par
@@ -625,11 +626,11 @@ go-vtk-cmake-reparbuild() {
     go-vtk-cmake--build
 }
 
-go-vtk-cmake-install() {
-    cmake \
+go-vtk-cmake-install() (
+    exec cmake \
         --install "${vtk_cmake_build:?}" \
         --verbose
-}
+)
 
 go-vtk-run() {
     PATH=${vtk_run_bindir:?}${PATH:+:${PATH:?}} \
@@ -671,32 +672,32 @@ go-src() {
     go vtk run "${FUNCNAME[0]:?}-$@"
 }
 
-go-src-clean() {
-    rm -rf \
+go-src-clean() (
+    exec rm -rf \
         "${src_cmake_build:?}" \
         "${src_cmake_stage:?}"
-}
+)
 
 go-src-cmake() {
     "${FUNCNAME[0]:?}-$@"
 }
 
-go-src-cmake-configure() {
-    cmake \
+go-src-cmake-configure() (
+    exec cmake \
         -H"${src_cmake_source:?}" \
         -B"${src_cmake_build:?}" \
         -DCMAKE_INSTALL_PREFIX:PATH="${src_cmake_stage:?}" \
         "${src_cmake_config[@]}"
-}
+)
 
 # env: re, par
-go-src-cmake--build() {
-    cmake \
+go-src-cmake--build() (
+    exec cmake \
         --build "${src_cmake_build:?}" \
         --verbose \
         ${re+--clean-first} \
         ${par+--parallel}
-}
+)
 
 go-src-cmake-build() {
     local re par
@@ -718,11 +719,11 @@ go-src-cmake-reparbuild() {
     go-src-cmake--build
 }
 
-go-src-cmake-install() {
-    cmake \
+go-src-cmake-install() (
+    exec cmake \
         --install "${src_cmake_build:?}" \
         --verbose
-}
+)
 
 go-src-run() {
     PATH=${src_run_bindir:?}${PATH:+:${PATH:?}} \
@@ -742,6 +743,57 @@ go-src-exec() {
 
 #---
 
+go--demo-exec() {
+    1>"${root:?}/tmp/output.txt" \
+    2>&1 \
+    go "$@"
+}
+
+go-demo() {
+    go() {
+        local _go_tmp
+        printf -v _go_tmp $' %q' go "$@"
+        printf -v _go_tmp $'$%s' "${_go_tmp:?}"
+
+        1>&2 printf $'%s' "${_go_tmp:?}"
+
+        if
+            /usr/bin/time \
+            -f $'\r[real %E]'" ${_go_tmp:?}" \
+            -- \
+                "${root:?}/go.sh" \
+                -demo-exec \
+                    "$@"
+        then
+            return 0
+        else
+            1>&2 printf $'Command failed. Output:\n'
+            1>&2 printf $'====\n'
+            1>&2 cat "${root:?}/tmp/output.txt"
+            1>&2 printf $'====\n'
+            return 1
+        fi
+    }
+
+    go src cmake configure \
+    || die "Configure failed"
+
+    go src cmake build \
+    || die "Build failed"
+
+    go src cmake install \
+    || die "Install failed"
+
+    go() {
+        "${FUNCNAME[0]:?}-$@"
+    }
+
+    go src exec mpirun -np 1 gdb -ex=r --args vtkPDistributedDataFilterExample
+}
+
+
+#---
+
 go() {
     "${FUNCNAME[0]:?}-$@"
 }
@@ -751,5 +803,4 @@ test -f "${root:?}/${hostname:+@${hostname:?}.env.sh}" && source "${_:?}"
 test -f "${root:?}/${user:+${user:?}@.env.sh}" && source "${_:?}"
 test -f "${root:?}/${user:+${hostname:+${user:?}@${hostname:?}.env.sh}}" && source "${_:?}"
 
-set -x
 go "$@"

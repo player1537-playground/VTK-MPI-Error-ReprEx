@@ -14,10 +14,24 @@
 #include <vtkOSPRayRendererNode.h>
 #include <vtkRenderer.h>
 #include <vtkWindowToImageFilter.h>
+#include <vtkObjectFactory.h>
+#include <vtkObjectFactoryCollection.h>
 
 int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
+
+    using ObjectFactory = vtkObjectFactory;
+    using ObjectFactoryCollection = vtkObjectFactoryCollection;
+    ObjectFactoryCollection *objectFactoryCollection = ObjectFactory::GetRegisteredFactories();
+
+    using CollectionSimpleIterator = vtkCollectionSimpleIterator;
+    CollectionSimpleIterator collectionSimpleIterator;
+    objectFactoryCollection->InitTraversal(collectionSimpleIterator);
+    ObjectFactory *objectFactory{nullptr};
+    while ((objectFactory = objectFactoryCollection->GetNextObjectFactory(collectionSimpleIterator)) != nullptr) {
+        std::cout << *objectFactory << std::endl;
+    }
 
     const int Width = 512;
     const int Height = 512;

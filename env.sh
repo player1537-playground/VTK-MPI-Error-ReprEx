@@ -6,7 +6,7 @@ if [ "${USER:-}" = "thobson" ]; then
 fi
 
 ospray_cmake_config+=(
-    -DCMAKE_BUILD_TYPE:STRING=DebWithRelInfo
+    -DCMAKE_BUILD_TYPE:STRING=Debug
 )
 vtk_cmake_config+=(
     -DCMAKE_BUILD_TYPE:STRING=Debug
